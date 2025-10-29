@@ -1,6 +1,8 @@
 pipeline {
     agent {
         kubernetes {
+            label 'kaniko-pod'
+            defaultContainer 'kaniko'
             yaml """
 apiVersion: v1
 kind: Pod
@@ -15,27 +17,24 @@ spec:
     }
 
     environment {
-        REGISTRY = "harbor.local"                  // Harbor URL
-        IMAGE_NAME = "first-project/spring-demo"             // Tên image
-        IMAGE_TAG = "latest"                        // Tag image
+        HARBOR_URL  = "harbor.local"
+        PROJECT     = "first-project"
+        IMAGE_NAME  = "spring-demo"
+        TAG         = "latest"
+        DOCKERFILE  = "Dockerfile"
     }
 
     stages {
         stage('Checkout Code') {
             steps {
-                checkout scm
+                git url: 'https://github.com/your-user/spring-demo.git', branch: 'main'
             }
         }
 
         stage('Build Spring Boot Jar') {
             steps {
-                sh './mvnw clean package -DskipTests'
-            }
-        }
-        stage('Stage Debug') {
-            steps {
                 container('kaniko') {
-                    sh "ls -la /workspace"
+                    sh 'mvn clean package -DskipTests'
                 }
             }
         }
@@ -45,10 +44,9 @@ spec:
                 container('kaniko') {
                     sh """
                     /kaniko/executor \
-                      --dockerfile=/workspace/Dockerfile \
-                      --context=/workspace \
-                      --destination=${REGISTRY}/${IMAGE_NAME}:${IMAGE_TAG} \
-                      --insecure \
+                      --dockerfile=${DOCKERFILE} \
+                      --context=dir://. \
+                      --destination=${HARBOR_URL}/${PROJECT}/${IMAGE_NAME}:${TAG} \
                       --skip-tls-verify
                     """
                 }
@@ -57,11 +55,8 @@ spec:
     }
 
     post {
-        success {
-            echo "Pipeline completed successfully!"
-        }
-        failure {
-            echo "Pipeline failed."
+        always {
+            echo "Pipeline finished!"
         }
     }
 }
