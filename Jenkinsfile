@@ -8,6 +8,7 @@ apiVersion: v1
 kind: Pod
 spec:
   serviceAccountName: jenkins-kaniko
+  automountServiceAccountToken: true
   containers:
   - name: kaniko
     image: gcr.io/kaniko-project/executor:latest
