@@ -32,6 +32,13 @@ spec:
                 sh './mvnw clean package -DskipTests'
             }
         }
+        stage('Stage Debug') {
+            steps {
+                container('kaniko') {
+                    sh "ls -la /workspace"
+                }
+            }
+        }
 
         stage('Build & Push Docker Image') {
             steps {
