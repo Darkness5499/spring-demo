@@ -25,11 +25,12 @@ pipeline {
           sh '''
             echo "🚀 Starting Kaniko build..."
             /kaniko/executor \
-              --dockerfile=/workspace/Dockerfile \
-              --context=/workspace/ \
+              --dockerfile=/home/jenkins/agent/Dockerfile \
+              --context=/home/jenkins/agent/ \
               --destination=$IMAGE \
               --skip-tls-verify \
               --verbosity=debug
+
           '''
         }
       }
