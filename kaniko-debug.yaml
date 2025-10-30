@@ -6,31 +6,28 @@ metadata:
 spec:
   restartPolicy: Never
   containers:
-  - name: kaniko
-    image: gcr.io/kaniko-project/executor:v1.11.0
-    env:
-      - name: DOCKER_CONFIG
-        value: /kaniko/.docker
-    command:
-      - /kaniko/executor
-    args:
-      - "--dockerfile=/workspace/Dockerfile"
-      - "--context=/workspace/"
-      - "--destination=harbor.local/spring-demo/spring-demo:latest"
-      - "--verbosity=debug"
-      - "--skip-tls-verify"
-    volumeMounts:
-      - name: workspace
-        mountPath: /workspace
-      - name: kaniko-secret
-        mountPath: /kaniko/.docker
-  - name: sleep
-    image: busybox
-    command: ["sh", "-c", "echo 'Build finished, sleeping for debug...'; sleep 3600"]
+    - name: kaniko
+      image: gcr.io/kaniko-project/executor:v1.11.0
+      env:
+        - name: DOCKER_CONFIG
+          value: /kaniko/.docker
+      command:
+        - /kaniko/executor
+      args:
+        - "--dockerfile=/home/jenkins/agent/workspace/${JOB_NAME}/Dockerfile"
+        - "--context=/home/jenkins/agent/workspace/${JOB_NAME}/"
+        - "--destination=harbor.local/spring-demo/spring-demo:latest"
+        - "--verbosity=debug"
+        - "--skip-tls-verify"
+      volumeMounts:
+        - name: kaniko-secret
+          mountPath: /kaniko/.docker
+
+    - name: sleep
+      image: busybox
+      command: ["sh", "-c", "echo 'Build finished, sleeping for debug...'; sleep 3600"]
 
   volumes:
-    - name: workspace
-      emptyDir: {}
     - name: kaniko-secret
       secret:
         secretName: harbor-cred
