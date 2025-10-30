@@ -13,28 +13,29 @@ pipeline {
     stage('Checkout Code') {
       steps {
         container('kaniko') {
+          echo "Step 111111111111111111"
           // Checkout code từ Git repo
           checkout scm
         }
       }
     }
 
-    stage('Build and Push Image') {
-      steps {
-        container('kaniko') {
-          sh '''
-            echo "🚀 Starting Kaniko build..."
-            /kaniko/executor \
-              --dockerfile=/home/jenkins/agent/Dockerfile \
-              --context=/home/jenkins/agent/ \
-              --destination=$IMAGE \
-              --skip-tls-verify \
-              --verbosity=debug
+    // stage('Build and Push Image') {
+    //   steps {
+    //     container('kaniko') {
+    //       sh '''
+    //         echo "🚀 Starting Kaniko build..."
+    //         /kaniko/executor \
+    //           --dockerfile=/home/jenkins/agent/Dockerfile \
+    //           --context=/home/jenkins/agent/ \
+    //           --destination=$IMAGE \
+    //           --skip-tls-verify \
+    //           --verbosity=debug
 
-          '''
-        }
-      }
-    }
+    //       '''
+    //     }
+    //   }
+    // }
 
     stage('Debug Pod (optional)') {
       steps {
