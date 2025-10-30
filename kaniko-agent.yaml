@@ -3,21 +3,27 @@ kind: Pod
 metadata:
   name: kaniko-agent
 spec:
+  restartPolicy: Never
   containers:
   - name: kaniko
     image: gcr.io/kaniko-project/executor:v1.11.0
+    command: ["/bin/sh", "-c"]
     args:
-      - "--dockerfile=/workspace/Dockerfile"
-      - "--context=/workspace/"
-      - "--destination=harbor.local/spring-demo/spring-demo:latest"
-      - "--docker-config=/kaniko/.docker"
-      - "--verbosity=debug"
+      - >
+        /kaniko/executor
+        --dockerfile=/workspace/Dockerfile
+        --context=/workspace/
+        --destination=harbor.local/spring-demo/spring-demo:latest
+        --docker-config=/kaniko/.docker
+        --verbosity=debug
+        || true;
+        echo "Build finished, sleeping for debug...";
+        sleep 3600
     volumeMounts:
       - name: workspace
         mountPath: /workspace
       - name: kaniko-secret
         mountPath: /kaniko/.docker
-  restartPolicy: Never
   volumes:
     - name: workspace
       emptyDir: {}
