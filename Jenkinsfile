@@ -1,66 +1,30 @@
 pipeline {
     agent {
         kubernetes {
-            label 'kaniko-pod'
-            defaultContainer 'kaniko'
-            yaml """
-apiVersion: v1
-kind: Pod
-spec:
-  serviceAccountName: jenkins-kaniko
-  automountServiceAccountToken: true
-  containers:
-  - name: kaniko
-    image: gcr.io/kaniko-project/executor:latest
-    tty: true
-"""
+            yamlFile 'kaniko-agent.yaml'
         }
-    }
-
-    environment {
-        HARBOR_URL  = "harbor.local"
-        PROJECT     = "first-project"
-        IMAGE_NAME  = "spring-demo"
-        TAG         = "latest"
-        DOCKERFILE  = "Dockerfile"
     }
 
     stages {
-        stage('Checkout Code') {
+        stage('Checkout') {
             steps {
-            
-                git url: 'https://github.com/your-user/spring-demo.git', branch: 'main'
+                checkout scm
             }
         }
 
-        stage('Build Spring Boot Jar') {
+        stage('Build & Push Image') {
             steps {
-                
                 container('kaniko') {
-                    sh 'mvn clean package -DskipTests'
-                }
-            }
-        }
-
-        stage('Build & Push Docker Image') {
-            steps {
-                
-                container('kaniko') {
-                    sh """
+                    sh '''
                     /kaniko/executor \
-                      --dockerfile=${DOCKERFILE} \
-                      --context=dir://. \
-                      --destination=${HARBOR_URL}/${PROJECT}/${IMAGE_NAME}:${TAG} \
-                      --skip-tls-verify
-                    """
+                      --dockerfile=/workspace/Dockerfile \
+                      --context=/workspace/ \
+                      --destination=harbor.local/spring-demo/spring-demo:${GIT_COMMIT} \
+                      --docker-config=/kaniko/.docker \
+                      --verbosity=debug
+                    '''
                 }
             }
-        }
-    }
-
-    post {
-        always {
-            echo "Pipeline finished!"
         }
     }
 }
