@@ -24,9 +24,12 @@ spec:
         mountPath: /workspace
       - name: kaniko-secret
         mountPath: /kaniko/.docker
+  # GIỮ POD SAU KHI CHẠY
+  terminationGracePeriodSeconds: 600
   volumes:
     - name: workspace
       emptyDir: {}
     - name: kaniko-secret
       secret:
         secretName: harbor-cred
+  
