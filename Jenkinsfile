@@ -1,7 +1,7 @@
 pipeline {
   agent {
     kubernetes {
-      yamlFile 'kaniko-debug.yaml'   // Jenkins sẽ dùng file Pod này
+      yamlFile 'kaniko-debug.yaml'
     }
   }
 
@@ -12,30 +12,28 @@ pipeline {
   stages {
     stage('Checkout Code') {
       steps {
+        echo "step 11111111111111"
         container('kaniko') {
-          echo "Step 111111111111111111"
-          // Checkout code từ Git repo
           checkout scm
         }
       }
     }
 
-    // stage('Build and Push Image') {
-    //   steps {
-    //     container('kaniko') {
-    //       sh '''
-    //         echo "🚀 Starting Kaniko build..."
-    //         /kaniko/executor \
-    //           --dockerfile=/home/jenkins/agent/Dockerfile \
-    //           --context=/home/jenkins/agent/ \
-    //           --destination=$IMAGE \
-    //           --skip-tls-verify \
-    //           --verbosity=debug
-
-    //       '''
-    //     }
-    //   }
-    // }
+    stage('Build and Push Image') {
+      steps {
+        container('kaniko') {
+          sh '''
+            echo "🚀 Starting Kaniko build..."
+            /kaniko/executor \
+              --dockerfile=/workspace/Dockerfile \
+              --context=/workspace/ \
+              --destination=$IMAGE \
+              --skip-tls-verify \
+              --verbosity=debug
+          '''
+        }
+      }
+    }
 
     stage('Debug Pod (optional)') {
       steps {
