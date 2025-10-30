@@ -24,9 +24,11 @@ pipeline {
         container('kaniko') {
           sh '''
             echo "🚀 Starting Kaniko build..."
+            echo "Current workspace: $WORKSPACE"
+            ls -al $WORKSPACE
             /kaniko/executor \
-              --dockerfile=/workspace/Dockerfile \
-              --context=/workspace/ \
+              --dockerfile=$WORKSPACE/Dockerfile \
+              --context=$WORKSPACE \
               --destination=$IMAGE \
               --skip-tls-verify \
               --verbosity=debug
@@ -34,6 +36,7 @@ pipeline {
         }
       }
     }
+
 
     stage('Debug Pod (optional)') {
       steps {
