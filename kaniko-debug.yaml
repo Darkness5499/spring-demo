@@ -11,6 +11,8 @@ spec:
     env:
       - name: DOCKER_CONFIG
         value: /kaniko/.docker
+    command:
+      - /kaniko/executor
     args:
       - "--dockerfile=/workspace/Dockerfile"
       - "--context=/workspace/"
