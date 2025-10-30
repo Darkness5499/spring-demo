@@ -9,7 +9,7 @@ spec:
     args:
       - "--dockerfile=/workspace/Dockerfile"
       - "--context=/workspace/"
-      - "--destination=harbor.example.com/myproject/myapp:latest"
+      - "--destination=harbor.local/spring-demo/spring-demo:latest"
       - "--docker-config=/kaniko/.docker"
       - "--verbosity=debug"
     volumeMounts:
