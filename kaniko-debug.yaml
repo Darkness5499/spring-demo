@@ -23,7 +23,8 @@ spec:
         value: /kaniko/.docker
     volumeMounts:
       - name: kaniko-secret
-        mountPath: /kaniko/.docker
+        mountPath: /kaniko/.docker/config.json
+        subPath: .dockerconfigjson
       - name: jenkins-workspace
         mountPath: /workspace
 
