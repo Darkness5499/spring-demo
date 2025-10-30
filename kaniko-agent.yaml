@@ -2,33 +2,33 @@ apiVersion: v1
 kind: Pod
 metadata:
   name: kaniko-agent
+  namespace: jenkins
 spec:
   restartPolicy: Never
   containers:
+  # Container Kaniko thực hiện build
   - name: kaniko
     image: gcr.io/kaniko-project/executor:v1.11.0
     args:
-      - >
-        /kaniko/executor
-        --dockerfile=/workspace/Dockerfile
-        --context=/workspace/
-        --destination=harbor.local/spring-demo/spring-demo:latest
-        --docker-config=/kaniko/.docker
-        --verbosity=debug
-        || true;
-        echo "Build finished, sleeping for debug...";
-        sleep 3600
+      - "--dockerfile=/workspace/Dockerfile"
+      - "--context=/workspace/"
+      - "--destination=harbor.local/spring-demo/spring-demo:latest"
+      - "--docker-config=/kaniko/.docker"
+      - "--verbosity=debug"
     volumeMounts:
       - name: workspace
         mountPath: /workspace
       - name: kaniko-secret
         mountPath: /kaniko/.docker
-  # GIỮ POD SAU KHI CHẠY
-  terminationGracePeriodSeconds: 600
+
+  # Container phụ giữ pod sống sau khi build
+  - name: sleep
+    image: busybox
+    command: ["sh", "-c", "echo 'Build finished, sleeping for debug...'; sleep 3600"]
+
   volumes:
     - name: workspace
       emptyDir: {}
     - name: kaniko-secret
       secret:
         secretName: harbor-cred
-  
