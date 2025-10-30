@@ -6,7 +6,7 @@ pipeline {
   }
 
   environment {
-    IMAGE = "harbor.local/spring-demo/spring-demo:latest"
+    IMAGE = "harbor-registry.harbor.svc.cluster.local:5000/spring-demo/spring-demo:latest"
   }
 
   stages {
