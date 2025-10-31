@@ -6,9 +6,6 @@ metadata:
 spec:
   restartPolicy: Never
   hostAliases:
-    - ip: "10.104.20.1"          # IP của service harbor-registry
-      hostnames:
-        - "harbor.local"
   containers:
   - name: kaniko
     image: gcr.io/kaniko-project/executor:debug
