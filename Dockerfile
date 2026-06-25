@@ -1,30 +1,12 @@
-# --------- Build stage ---------
-FROM eclipse-temurin:21-jdk AS build
+# Bước 1: Dùng Image Maven để build file JAR
+FROM maven:3.8.runtime-openjdk-17 AS build
 WORKDIR /app
+COPY . .
+RUN mvn clean package -DskipTests
 
-# Copy Maven wrapper & pom.xml
-COPY mvnw .
-COPY .mvn .mvn
-COPY pom.xml .
-
-# Download dependencies (cache layer)
-RUN ./mvnw dependency:go-offline -B
-
-# Copy source code
-COPY src ./src
-
-# Build jar
-RUN ./mvnw package -DskipTests
-
-# --------- Run stage ---------
-FROM eclipse-temurin:21-jre
+# Bước 2: Dùng Image JRE tinh gọn để chạy file JAR (giúp giảm dung lượng)
+FROM openjdk:17-jdk-slim
 WORKDIR /app
-
-# Copy đúng jar đã build
-COPY --from=build /app/target/spring-demo-0.0.1-SNAPSHOT.jar app.jar
-
-# Expose port Spring Boot
-EXPOSE 8080
-
-# Run Spring Boot app
+COPY --from=build /app/target/*.jar app.jar
+EXPOSE 8081
 ENTRYPOINT ["java", "-jar", "app.jar"]
