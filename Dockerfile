@@ -1,12 +1,13 @@
-# Bước 1: Dùng Image Maven để build file JAR
-FROM maven:3.8.runtime-openjdk-17 AS build
+# Giai đoạn 1: Dùng JDK 21 để build file JAR
+FROM maven:3.9.6-eclipse-temurin-21 AS build
 WORKDIR /app
-COPY . .
+COPY pom.xml .
+COPY src ./src
 RUN mvn clean package -DskipTests
 
-# Bước 2: Dùng Image JRE tinh gọn để chạy file JAR (giúp giảm dung lượng)
-FROM openjdk:17-jdk-slim
+# Giai đoạn 2: Kéo bản JRE 21 Slim về để chạy (Thay thế cho bản openjdk cũ bị lỗi)
+FROM eclipse-temurin:21-jre-jammy
 WORKDIR /app
 COPY --from=build /app/target/*.jar app.jar
-EXPOSE 8081
+EXPOSE 8080
 ENTRYPOINT ["java", "-jar", "app.jar"]
