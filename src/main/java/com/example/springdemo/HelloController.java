@@ -11,5 +11,9 @@ public class HelloController {
     @GetMapping("hello")
     public String hello(){
         return "Hello World";
+    }@GetMapping("hello1")
+    public String hello1(){
+        return "Chào mừng bạn đến với K8s service đầu tiên";
     }
+
 }
